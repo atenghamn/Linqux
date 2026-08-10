@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linqux", "Linqux\Linqux.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linqux.LinqEngine", "Linqux.LinqEngine\Linqux.LinqEngine.csproj", "{3169FD6A-DC07-4D25-88E6-E78A52A1348D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linqux.LinqEngine.Tests", "Linqux.LinqEngine.Tests\Linqux.LinqEngine.Tests.csproj", "{ADB01755-5E68-432B-9B60-D64362944724}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{3169FD6A-DC07-4D25-88E6-E78A52A1348D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3169FD6A-DC07-4D25-88E6-E78A52A1348D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3169FD6A-DC07-4D25-88E6-E78A52A1348D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADB01755-5E68-432B-9B60-D64362944724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADB01755-5E68-432B-9B60-D64362944724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADB01755-5E68-432B-9B60-D64362944724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADB01755-5E68-432B-9B60-D64362944724}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

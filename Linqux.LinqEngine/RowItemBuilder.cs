@@ -49,12 +49,9 @@ public static class RowItemBuilder
         foreach (var item in snapshot)
         {
             var values = new Dictionary<string, object?>(StringComparer.Ordinal);
-            if (item != null)
+            foreach (var property in properties)
             {
-                foreach (var property in properties)
-                {
-                    values[property.Name] = property.GetValue(item);
-                }
+                values[property.Name] = item == null ? null : property.GetValue(item);
             }
 
             rows.Add(Activator.CreateInstance(rowType, values)!);
