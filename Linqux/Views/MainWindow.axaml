@@ -59,6 +59,7 @@
                     </ScrollViewer>
 
                     <DataGrid ItemsSource="{Binding QueryResult}"
+                              AutoGenerateColumns="True"
                               IsReadOnly="True"
                               GridLinesVisibility="All"
                               IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>

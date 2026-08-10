@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,7 +22,7 @@ public partial class MainWindowViewModel : ObservableObject
     private string _linqQuery = "db.Something.Take(10)";
 
     [ObservableProperty]
-    private DataTable? _queryResult;
+    private IReadOnlyList<object>? _queryResult;
 
     [ObservableProperty]
     private string? _generatedSql;

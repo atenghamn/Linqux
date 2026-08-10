@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Data;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -52,7 +51,7 @@ public static class Engine
 
                 if (rawResult is IEnumerable enumerable)
                 {
-                    result.Data = ConvertToDataTable(enumerable);
+                    result.Data = RowItemBuilder.Build(enumerable);
                 }
             }
         }
@@ -66,48 +65,5 @@ public static class Engine
         }
 
         return result;
-    }
-
-    private static DataTable ConvertToDataTable(IEnumerable items)
-    {
-        var dataTable = new DataTable();
-        PropertyInfo[]? properties = null;
-
-        foreach (var item in items)
-        {
-            if (item == null) continue;
-
-            if (properties == null)
-            {
-                properties = item.GetType().GetProperties();
-                foreach (var prop in properties)
-                {
-                    Type columnType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-                    if (!columnType.IsValueType && columnType != typeof(string))
-                    {
-                        columnType = typeof(string);
-                    }
-
-                    dataTable.Columns.Add(prop.Name, columnType);
-                }
-            }
-
-            var row = dataTable.NewRow();
-            foreach (var prop in properties)
-            {
-                var val = prop.GetValue(item);
-                if (val != null && !prop.PropertyType.IsValueType && prop.PropertyType != typeof(string))
-                {
-                    row[prop.Name] = val.ToString();
-                }
-                else
-                {
-                    row[prop.Name] = val ?? DBNull.Value;
-                }
-            }
-            dataTable.Rows.Add(row);
-        }
-
-        return dataTable;
     }
 }

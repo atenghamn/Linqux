@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Scaffolding;
@@ -31,6 +32,7 @@ public static class ScaffoldingService
     public const string ModelsNamespace = "Linqux.RuntimeModels";
     private const string DbContextName = "ScaffoldedDbContext";
     private const string GlobalsTypeName = "LinquxQueryGlobals";
+    private const string CacheVersion = "2";
 
     private static string ConfigDir =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "linqux");
@@ -45,6 +47,14 @@ public static class ScaffoldingService
         {
             DeleteDirectory(cacheDir);
         }
+        else
+        {
+            var marker = Path.Combine(cacheDir, CacheVersionFile);
+            if (Directory.Exists(cacheDir) && (!File.Exists(marker) || File.ReadAllText(marker).Trim() != CacheVersion))
+            {
+                DeleteDirectory(cacheDir);
+            }
+        }
 
         if (Directory.Exists(cacheDir) && Directory.EnumerateFiles(cacheDir, "*.cs", SearchOption.AllDirectories).Any())
         {
@@ -54,8 +64,11 @@ public static class ScaffoldingService
         Directory.CreateDirectory(cacheDir);
         await ScaffoldInProcessAsync(connectionString, cacheDir, ct);
         WriteSupplementalFiles(cacheDir);
+        File.WriteAllText(Path.Combine(cacheDir, CacheVersionFile), CacheVersion);
         return CompileModels(cacheDir);
     }
+
+    private const string CacheVersionFile = ".linqux-cache-version";
 
     /// <summary>
     /// Runs the EF Core reverse-engineering pipeline (the same one the <c>dotnet ef</c> tool uses)
@@ -77,7 +90,7 @@ public static class ScaffoldingService
 
                 var model = scaffolder.ScaffoldModel(
                     connectionString,
-                    new DatabaseModelFactoryOptions(),
+                    GetDatabaseModelFactoryOptions(connectionString),
                     new ModelReverseEngineerOptions(),
                     new ModelCodeGenerationOptions
                     {
@@ -120,6 +133,43 @@ public static class ScaffoldingService
         }
 
         File.WriteAllText(path, file.Code);
+    }
+
+    /// <summary>
+    /// Scaffolds only the user schemas, excluding infrastructure schemas such as the per-service
+    /// Hangfire schemas that would otherwise produce a flood of duplicate entity types.
+    /// Falls back to "all schemas" if the schema list cannot be queried.
+    /// </summary>
+    private static DatabaseModelFactoryOptions GetDatabaseModelFactoryOptions(string connectionString)
+    {
+        try
+        {
+            using var connection = new SqlConnection(connectionString);
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT s.[name]
+                FROM sys.schemas s
+                WHERE s.[name] NOT IN ('sys', 'INFORMATION_SCHEMA', 'guest')
+                  AND s.[name] NOT LIKE 'HangFire%'
+                ORDER BY s.[name];
+                """;
+
+            var schemas = new List<string>();
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                schemas.Add(reader.GetString(0));
+            }
+
+            return schemas.Count > 0
+                ? new DatabaseModelFactoryOptions(schemas: schemas)
+                : new DatabaseModelFactoryOptions();
+        }
+        catch
+        {
+            return new DatabaseModelFactoryOptions();
+        }
     }
 
     private static void WriteSupplementalFiles(string modelsDir)
