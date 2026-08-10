@@ -13,49 +13,46 @@ public partial class MainWindowViewModel : ObservableObject
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
-    private string _connectionString = "";
+    public partial string ConnectionString { get; set; } = "";
+    [ObservableProperty]
+    public partial bool UseInteractiveAuth { get; set; }
+    [ObservableProperty]
+    public partial string LinqQuery { get; set; } = "db.Something.Take(10)";
 
     [ObservableProperty]
-    private bool _useInteractiveAuth;
+    public partial IReadOnlyList<object>? QueryResult { get; set; }
 
     [ObservableProperty]
-    private string _linqQuery = "db.Something.Take(10)";
+    public partial string? GeneratedSql { get; set; }
 
     [ObservableProperty]
-    private IReadOnlyList<object>? _queryResult;
-
-    [ObservableProperty]
-    private string? _generatedSql;
-
-    [ObservableProperty]
-    private string? _errorMessage;
+    public partial string? ErrorMessage { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ExecuteQueryCommand))]
-    private bool _isBusy;
+    public partial bool IsBusy { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
     [NotifyCanExecuteChangedFor(nameof(ExecuteQueryCommand))]
-    private bool _isScaffolding;
+    public partial bool IsScaffolding { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ExecuteQueryCommand))]
-    private bool _isConnected;
+    public partial bool IsConnected { get; set; }
 
     [ObservableProperty]
-    private string _connectionStatus = "Not connected";
+    public partial string ConnectionStatus { get; set; } = "Not connected";
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
-    private bool _forceRescaffold;
+    public partial bool ForceRescaffold { get; set; }
 
     [ObservableProperty]
-    private string? _selectedConfigName;
+    public partial string? SelectedConfigName { get; set; }
 
     [ObservableProperty]
-    private string _configName = "";
-
+    public partial string ConfigName { get; set; } = "";
     public ObservableCollection<string> SavedConfigs { get; } = new();
 
     private ScaffoldedModel? _model;
@@ -79,11 +76,10 @@ public partial class MainWindowViewModel : ObservableObject
         if (string.IsNullOrEmpty(value)) return;
 
         var connection = ConnectionConfigStore.Load().FirstOrDefault(c => c.Name == value);
-        if (connection != null)
-        {
-            ConnectionString = connection.ConnectionString;
-            ConfigName = connection.Name;
-        }
+        if (connection == null) return;
+        
+        ConnectionString = connection.ConnectionString;
+        ConfigName = connection.Name;
     }
 
     private bool CanConnect() => !IsScaffolding && !string.IsNullOrWhiteSpace(ConnectionString);

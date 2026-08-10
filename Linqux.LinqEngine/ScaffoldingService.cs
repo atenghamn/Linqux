@@ -63,12 +63,36 @@ public static class ScaffoldingService
 
         Directory.CreateDirectory(cacheDir);
         await ScaffoldInProcessAsync(connectionString, cacheDir, ct);
+        
         WriteSupplementalFiles(cacheDir);
-        File.WriteAllText(Path.Combine(cacheDir, CacheVersionFile), CacheVersion);
+        await File.WriteAllTextAsync(Path.Combine(cacheDir, CacheVersionFile), CacheVersion, ct);
+        
         return CompileModels(cacheDir);
     }
 
     private const string CacheVersionFile = ".linqux-cache-version";
+
+    private const string ModelsAssemblyName = "Linqux.RuntimeModels";
+
+    private static Assembly? _latestModelsAssembly;
+    private static int _resolverAttached;
+
+    /// <summary>
+    /// Registers a single <see cref="AssemblyLoadContext.Resolving"/> handler that maps the
+    /// in-memory models assembly to the most recently loaded instance. Registering once (instead of
+    /// once per scaffold) keeps re-scaffolding and multiple connections working.
+    /// </summary>
+    private static void RegisterModelsAssembly(Assembly assembly)
+    {
+        _latestModelsAssembly = assembly;
+        if (Interlocked.Exchange(ref _resolverAttached, 1) != 0)
+        {
+            return;
+        }
+
+        AssemblyLoadContext.Default.Resolving += (_, name) =>
+            name.Name == ModelsAssemblyName ? _latestModelsAssembly : null;
+    }
 
     /// <summary>
     /// Runs the EF Core reverse-engineering pipeline (the same one the <c>dotnet ef</c> tool uses)
@@ -220,9 +244,7 @@ public static class ScaffoldingService
 
         var image = ms.ToArray();
         var assembly = Assembly.Load(image);
-        var assemblyName = assembly.GetName().Name ?? "Linqux.RuntimeModels";
-        AssemblyLoadContext.Default.Resolving += (_, name) =>
-            name.Name == assemblyName ? assembly : null;
+        RegisterModelsAssembly(assembly);
 
         var contextType = assembly.GetType($"{ModelsNamespace}.{DbContextName}")
             ?? throw new InvalidOperationException($"Scaffolded DbContext type '{ModelsNamespace}.{DbContextName}' was not found.");

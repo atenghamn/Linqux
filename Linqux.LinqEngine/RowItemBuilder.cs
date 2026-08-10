@@ -49,12 +49,9 @@ public static class RowItemBuilder
         foreach (var item in snapshot)
         {
             var values = new Dictionary<string, object?>(StringComparer.Ordinal);
-            if (item != null)
+            foreach (var property in properties)
             {
-                foreach (var property in properties)
-                {
-                    values[property.Name] = property.GetValue(item);
-                }
+                values[property.Name] = item == null ? null : property.GetValue(item);
             }
 
             rows.Add(Activator.CreateInstance(rowType, values)!);
@@ -90,7 +87,7 @@ public static class RowItemBuilder
         var ctor = type.DefineConstructor(
             MethodAttributes.Public,
             CallingConventions.Standard,
-            new[] { typeof(Dictionary<string, object?>) });
+            [typeof(Dictionary<string, object?>)]);
         var ctorIl = ctor.GetILGenerator();
         ctorIl.Emit(OpCodes.Ldarg_0);
         ctorIl.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes)!);
