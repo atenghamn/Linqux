@@ -63,8 +63,10 @@ public static class ScaffoldingService
 
         Directory.CreateDirectory(cacheDir);
         await ScaffoldInProcessAsync(connectionString, cacheDir, ct);
+        
         WriteSupplementalFiles(cacheDir);
-        File.WriteAllText(Path.Combine(cacheDir, CacheVersionFile), CacheVersion);
+        await File.WriteAllTextAsync(Path.Combine(cacheDir, CacheVersionFile), CacheVersion, ct);
+        
         return CompileModels(cacheDir);
     }
 

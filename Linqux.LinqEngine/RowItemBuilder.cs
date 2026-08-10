@@ -90,7 +90,7 @@ public static class RowItemBuilder
         var ctor = type.DefineConstructor(
             MethodAttributes.Public,
             CallingConventions.Standard,
-            new[] { typeof(Dictionary<string, object?>) });
+            [typeof(Dictionary<string, object?>)]);
         var ctorIl = ctor.GetILGenerator();
         ctorIl.Emit(OpCodes.Ldarg_0);
         ctorIl.Emit(OpCodes.Call, typeof(object).GetConstructor(Type.EmptyTypes)!);

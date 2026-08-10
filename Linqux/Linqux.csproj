@@ -26,4 +26,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Linqux.LinqEngine\Linqux.LinqEngine.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assets\" />
+    </ItemGroup>
 </Project>
