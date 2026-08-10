@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Linqux.ViewModels"
+        x:Class="Linqux.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Linqux - LINQ Query Studio" Width="1100" Height="700">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, *, 2*">
+        <DockPanel Grid.Row="0" Margin="10">
+            <TextBlock Text="Connection String:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBox Text="{Binding ConnectionString}"
+                     PlaceholderText="Server=tcp:your-server.database.windows.net,1433;Initial Catalog=your-db;Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False"/>
+        </DockPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,0,10,10" Spacing="8">
+            <ComboBox ItemsSource="{Binding SavedConfigs}"
+                      SelectedItem="{Binding SelectedConfigName}"
+                      PlaceholderText="Saved connections"
+                      MinWidth="180" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding ConfigName}" PlaceholderText="Config name" MinWidth="120" VerticalAlignment="Center"/>
+            <Button Content="Save" Command="{Binding SaveConfigCommand}" VerticalAlignment="Center"/>
+            <Button Content="Remove" Command="{Binding RemoveConfigCommand}" VerticalAlignment="Center"/>
+            <CheckBox IsChecked="{Binding ForceRescaffold}" Content="Re-scaffold" VerticalAlignment="Center"/>
+            <CheckBox IsChecked="{Binding UseInteractiveAuth}" Content="Azure AD interactive sign-in (browser)" VerticalAlignment="Center"/>
+            <Button Content="Connect" Command="{Binding ConnectCommand}" Padding="15,8" VerticalAlignment="Center"/>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsScaffolding}" Width="100" Height="20" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10,0,10,10" Spacing="10">
+            <Button Content="Execute (F5)"
+                    Command="{Binding ExecuteQueryCommand}"
+                    HotKey="F5"
+                    Padding="15,8" Background="#2D7D9A" Foreground="White" FontWeight="Bold"/>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" Width="100" Height="20" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Grid Grid.Row="3" Margin="10,0,10,10">
+            <TextBox Text="{Binding LinqQuery}"
+                     AcceptsReturn="True"
+                     TextWrapping="NoWrap"
+                     FontFamily="Cascadia Code, Consolas, Monospace"
+                     FontSize="14"
+                     PlaceholderText="// Write your LINQ-query here, like: db.Something.Where(a => a.Amount > 100).Take(10)"/>
+        </Grid>
+
+        <!-- Splitter between code and result -->
+        <GridSplitter Grid.Row="4" VerticalAlignment="Bottom" Height="4" Background="#CCCCCC"/>
+
+        <TabControl Grid.Row="5" Margin="10,5,10,10">
+            <TabItem Header="Results">
+                <Grid>
+                    <ScrollViewer IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" FontFamily="Consolas" Margin="10" TextWrapping="Wrap"/>
+                    </ScrollViewer>
+
+                    <DataGrid ItemsSource="{Binding QueryResult}"
+                              IsReadOnly="True"
+                              GridLinesVisibility="All"
+                              IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Generated SQL">
+                <TextBox Text="{Binding GeneratedSql}"
+                         IsReadOnly="True"
+                         FontFamily="Cascadia Code, Consolas, Monospace"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

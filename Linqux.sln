@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linqux", "Linqux\Linqux.csproj", "{07C4F847-7A05-4997-A6EB-5818FF10FCD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linqux.LinqEngine", "Linqux.LinqEngine\Linqux.LinqEngine.csproj", "{3169FD6A-DC07-4D25-88E6-E78A52A1348D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07C4F847-7A05-4997-A6EB-5818FF10FCD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07C4F847-7A05-4997-A6EB-5818FF10FCD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07C4F847-7A05-4997-A6EB-5818FF10FCD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07C4F847-7A05-4997-A6EB-5818FF10FCD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3169FD6A-DC07-4D25-88E6-E78A52A1348D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3169FD6A-DC07-4D25-88E6-E78A52A1348D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3169FD6A-DC07-4D25-88E6-E78A52A1348D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3169FD6A-DC07-4D25-88E6-E78A52A1348D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
